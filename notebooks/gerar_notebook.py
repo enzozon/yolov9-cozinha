@@ -75,11 +75,11 @@ def detectar(pesos, origem, conf=0.25, nome='detect'):
               f'--source "{origem}" --project {RUNS}/detect --name {nome} --exist-ok')"""),
     ("code", """# 5. Treino (um por vez; ordem do plano). Comente o que já terminou.
 treinar('t', 1, 16)
-treinar('t', 2, 16)
-treinar('t', 3, 16)
+# treinar('t', 2, 16)  # grupo decidiu: só FOLD1
+# treinar('t', 3, 16)
 treinar('m', 1, 8)
-treinar('m', 2, 8)
-treinar('m', 3, 8)"""),
+# treinar('m', 2, 8)
+# treinar('m', 3, 8)"""),
     ("code", """# 6. Avaliação no Teste de cada fold (e na Validação, para escolher o threshold pela curva F1)
 for m in ('t', 'm'):
     for f in (1, 2, 3):
