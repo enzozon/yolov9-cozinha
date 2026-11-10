@@ -80,6 +80,8 @@ def main(raiz_grupo, destino):
     raiz_grupo, destino = Path(raiz_grupo), Path(destino)
     pool = indexar_pool([raiz_grupo / "FOLD1", raiz_grupo / "FOLD2"])
     print(f"pool: {len(pool)} imagens")
+    if not pool:
+        sys.exit(f"ERRO: nenhuma imagem em {raiz_grupo}/FOLD1 ou FOLD2 (caminho errado?)")
     for n in (1, 2, 3):
         r = montar_fold(raiz_grupo / f"FOLD{n}", pool, destino / f"fold{n}")
         print(f"\n== fold{n}")

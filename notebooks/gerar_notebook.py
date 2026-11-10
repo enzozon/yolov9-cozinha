@@ -14,7 +14,8 @@ drive.mount('/content/drive')
 import os
 os.environ['WANDB_MODE'] = 'disabled'; os.environ['WANDB_DISABLED'] = 'true'
 BASE = '/content/drive/MyDrive/yolov9_cozinha'   # código + runs
-GRUPO = '/content/drive/MyDrive/grupo 9'         # atalho para a pasta do grupo
+# pasta compartilhada do grupo, acessada pelo ID (precisa existir um atalho dela em qualquer lugar do Meu Drive)
+GRUPO = '/content/drive/.shortcut-targets-by-id/1gOMJcfLYc0l3CgHWWGT0xlPeZXidbn5K/grupo 9'
 RUNS = f'{BASE}/runs'
 os.makedirs(RUNS, exist_ok=True)
 !nvidia-smi --query-gpu=name,memory.total --format=csv"""),
