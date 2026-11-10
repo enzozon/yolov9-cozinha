@@ -1,0 +1,9 @@
+grupo 9/
+exemplos_train_val/
+*.zip
+*.docx
+*.ppt
+*.pdf
+*.pt
+__pycache__/
+.pytest_cache/

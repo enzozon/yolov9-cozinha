@@ -1,0 +1,6 @@
+Quem esta usando treinamento semantico, provavelmente vai ter um erro no final do treinamento da primeira época, trata-se de um erro no calculo das métricas da yolo.
+
+
+
+Corrigi o codigo, basta atualizar o arquivo metrics.py que esta na pasta utils.
+
