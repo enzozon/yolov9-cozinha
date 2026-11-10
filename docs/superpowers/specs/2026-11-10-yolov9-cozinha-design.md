@@ -121,3 +121,9 @@ Consequência para os slides: chamar de **“3 holdouts repetidos (sorteios inde
 
 - Escolha da GPU no momento, conforme disponibilidade e medida da 1ª época.
 - Layout fino dos slides dentro do estilo existente.
+
+## Mudança de escopo (2026-11-10, ~19:00)
+
+Pedido do usuário: treinar **só o FOLD1**, com YOLOv9-t e YOLOv9-m. O t_fold2 parcial foi descartado. Média ± desvio entre folds sai dos slides; a comparação t × m é feita no mesmo split (FOLD1: 806/100/103).
+
+Medido no Colab T4: t = 2,66 M parâmetros / 11,1 GFLOPs (com ramo auxiliar), 100 épocas em 0,73 h; m = 32,8 M / 132,5 GFLOPs, ~65 s/época.
