@@ -26,7 +26,10 @@ os.makedirs(RUNS, exist_ok=True)
 !pip install -q -r requirements.txt
 !cp {BASE}/code/metrics.py {BASE}/code/plots.py {BASE}/code/augmentations.py utils/
 !cp {BASE}/code/experimental.py models/
-!grep -c "np.trapz(" utils/metrics.py || echo "trapz ok" """),
+!grep -c "np.trapz(" utils/metrics.py || echo "trapz ok"
+# PyTorch >= 2.6 mudou o padrão de torch.load (weights_only=True): sem isso o fim do treino quebra no strip_optimizer
+!sed -i "s/torch.load(f, map_location=torch.device('cpu'))/torch.load(f, map_location=torch.device('cpu'), weights_only=False)/" utils/general.py
+!sed -i "s/map_location='cpu')/map_location='cpu', weights_only=False)/" train_dual.py val_dual.py detect_dual.py"""),
     ("code", """# 3. Dataset: copia do Drive e monta os folds (FOLD3 busca imagens no pool FOLD1+FOLD2)
 !test -d /content/src || (mkdir -p /content/src && cp -r "{GRUPO}/FOLD1" "{GRUPO}/FOLD2" "{GRUPO}/FOLD3" /content/src/)
 !test -d /content/data || python {BASE}/code/montar_folds.py /content/src /content/data
@@ -39,6 +42,8 @@ def sh(cmd, log=None):
     p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, cwd='/content/yolov9')
     f = open(log, 'a') if log else None
     for linha in p.stdout:
+        if '%|' in linha and '100%|' not in linha:
+            continue  # barras de progresso parciais do tqdm: só poluem a saída
         print(linha, end='')
         if f: f.write(linha)
     p.wait()
@@ -48,7 +53,8 @@ def sh(cmd, log=None):
 def treinar(modelo, fold, batch, epocas=100):
     nome = f'{modelo}_fold{fold}'
     last = f'{RUNS}/{nome}/weights/last.pt'
-    if os.path.exists(f'{RUNS}/{nome}/weights/best.pt') and not os.path.exists(last):
+    csv_ = f'{RUNS}/{nome}/results.csv'
+    if os.path.exists(csv_) and sum(1 for _ in open(csv_)) - 1 >= epocas:
         print('já terminou:', nome); return 0
     if os.path.exists(last):
         cmd = f'python train_dual.py --resume {last}'
