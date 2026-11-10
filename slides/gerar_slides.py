@@ -54,16 +54,16 @@ def main():
         "Leonardo Pupin    Matheus Soares Fernandes",
         [("Universidade Vila Velha  ·  Ciência da Computação CC7/CC8  ·  Prof. Jairo Moraes", {"tam": 15, "cor": CLARO})]],
         21, "FFFFFF", alinha=PP_ALIGN.CENTER)
-    texto(s, 1.28, 10.04, 17.46, 0.5, "10 classes   ·   3 folds   ·   YOLOv9-t × YOLOv9-m   ·   100 épocas do zero",
+    texto(s, 1.28, 10.04, 17.46, 0.5, "10 classes   ·   FOLD1 80/10/10   ·   YOLOv9-t × YOLOv9-m   ·   100 épocas do zero",
           17, CLARO, MONO, alinha=PP_ALIGN.CENTER)
 
     # 2 roteiro
     s = slide_conteudo(d, "roteiro", "O que vamos mostrar", "Só ler os tópicos rapidamente; não explicar ainda.")
     itens = [("01", "Projeto", "o problema, aplicações e as dez classes"),
-             ("02", "Dados", "os três folds e como foram montados"),
+             ("02", "Dados", "os folds e qual usamos para treinar"),
              ("03", "Modelos", "YOLO, YOLOv9 e as versões t e m"),
              ("04", "Treino", "parâmetros, aumento de dados e threshold"),
-             ("05", "Resultados", "métricas por fold, por classe e confusões"),
+             ("05", "Resultados", "métricas no teste, por classe e confusões"),
              ("06", "Escolha", "qual modelo indicamos e por quê")]
     for i, (n, t, desc) in enumerate(itens):
         y = 2.75 + i * 1.18
@@ -80,7 +80,7 @@ def main():
          "Três sorteios 80/10/10 estratificados por classe.")
     card(s, 10.33, 2.76, 8.4, 3.6, LARANJA, "Etapa 2 · o modelo",
          "Treinar um detector que, dada uma foto, devolve a caixa e a classe de cada utensílio. "
-         "Dois tamanhos de YOLOv9, comparados nos três folds.")
+         "Dois tamanhos de YOLOv9, treinados e testados no mesmo fold.")
     texto(s, 1.28, 7.0, 17.4, 1.5, [[("Detecção responde duas perguntas: ", {}),
                                      ("o que é ", {"negrito": True}), ("e ", {}), ("onde está.", {"negrito": True}),
                                      (" Classificação responde só a primeira.", {"cor": CINZA})]], 22)
@@ -117,11 +117,11 @@ def main():
 
     # 6 dados / folds
     cont = ex.get("contagem", {})
-    s = slide_conteudo(d, "2 · dados", "Três sorteios independentes, 80 / 10 / 10",
-                       "Cada fold é um sorteio novo e estratificado por classe; a mesma foto pode estar no treino de um fold e no "
-                       "teste de outro — o que importa é não vazar dentro do fold, e o script verifica isso. O FOLD3 no Drive "
-                       "só tem os .txt; as imagens são buscadas pelo nome nos folds 1 e 2 (os nomes são únicos). "
-                       "Não chamamos de validação cruzada k-fold: são holdouts repetidos.")
+    s = slide_conteudo(d, "2 · dados", "Três sorteios prontos — treinamos no FOLD1",
+                       "Na etapa 1 geramos três sorteios 80/10/10 estratificados por classe. Treinar do zero leva de 45 min (t) a "
+                       "~2 h (m) por fold no T4, então o grupo decidiu treinar os dois modelos no mesmo FOLD1: a comparação "
+                       "t × m fica justa porque os dois veem exatamente as mesmas imagens de treino e de teste. "
+                       "O script confere que nenhuma imagem aparece em dois conjuntos do fold.")
     linhas_t = [["", "treino", "validação", "teste"]]
     for f in (1, 2, 3):
         c = cont.get(f"fold{f}", {})
@@ -129,10 +129,10 @@ def main():
     tabela(s, 1.28, 2.76, 8.4, linhas_t, [2.1, 2.1, 2.1, 2.1], 19)
     card(s, 10.33, 2.76, 8.4, 2.2, TEAL, "Sem vazamento dentro do fold",
          "Antes de treinar, o script confere que nenhum nome aparece em dois conjuntos do mesmo fold.", 17)
-    card(s, 10.33, 5.2, 8.4, 2.2, LARANJA, "FOLD3 só com rótulos",
-         "Para não duplicar 1 GB de fotos, o FOLD3 guarda só os .txt. A imagem vem do FOLD1/FOLD2 pelo nome.", 17)
-    texto(s, 1.28, 8.0, 17.4, 1.2, [[("Três sorteios mostram se a métrica é real ou sorte do sorteio: ", {}),
-                                     ("reportamos média ± desvio.", {"negrito": True})]], 21)
+    card(s, 10.33, 5.2, 8.4, 2.2, LARANJA, "Mesmo fold para os dois",
+         "t e m treinam e testam nas mesmas imagens: a diferença no resultado vem do modelo, não do sorteio.", 17)
+    texto(s, 1.28, 8.0, 17.4, 1.2, [[("FOLD1: ", {"negrito": True}),
+                                     ("806 imagens de treino, 100 de validação e 103 de teste, ~10 por classe no teste.", {})]], 21)
 
     # 7 detector de um estágio
     s = slide_conteudo(d, "3 · modelos", "YOLO: detectar em uma passada só",
@@ -228,19 +228,18 @@ def main():
          "Para medir mAP: 0.001 (curva completa). Para usar o modelo: o valor que maximiza o F1 na validação.", 17)
 
     # 13 resultados por fold
-    s = slide_conteudo(d, "5 · resultados", "Resultados no teste, por fold",
-                       "Ler a linha da média primeiro. O desvio entre folds diz quanto o resultado depende do sorteio. "
-                       "Cada fold tem ~100 imagens de teste.")
-    tab = [["modelo", "fold", "P", "R", "mAP50", "mAP50-95"]]
-    for l in sorted(linhas, key=lambda l: (l["modelo"], l["fold"])):
-        tab.append([f"YOLOv9-{l['modelo']}", str(int(l["fold"])), f"{l['P']:.3f}", f"{l['R']:.3f}",
-                    f"{l['mAP50']:.3f}", f"{l['mAP50_95']:.3f}"])
-    for m in ("t", "m"):
-        if any(l["modelo"] == m for l in linhas):
-            tab.append([f"YOLOv9-{m} · média", "", "", "", media(linhas, m, "mAP50"), media(linhas, m, "mAP50_95")])
+    s = slide_conteudo(d, "5 · resultados", "Resultados no teste (FOLD1)",
+                       "103 imagens que nenhum dos modelos viu no treino. P = das caixas que a rede desenhou, quantas estavam "
+                       "certas. R = dos objetos reais, quantos ela achou. mAP50 = área sob a curva precisão×revocação com IoU 0.5; "
+                       "mAP50-95 = a mesma coisa exigindo caixas cada vez mais justas.")
+    tab = [["modelo", "P", "R", "mAP50", "mAP50-95", "ms / imagem"]]
+    for l in sorted(linhas, key=lambda l: l["modelo"], reverse=True):  # t antes de m
+        tab.append([f"YOLOv9-{l['modelo']}", f"{l['P']:.3f}", f"{l['R']:.3f}", f"{l['mAP50']:.3f}",
+                    f"{l['mAP50_95']:.3f}", f"{l['ms_img']:.1f}" if l.get("ms_img") else "—"])
     if len(tab) == 1:
         tab.append(["—"] * 6)
-    tabela(s, 1.28, 2.6, 17.4, tab, [4.4, 1.6, 2.2, 2.2, 3.5, 3.5], 17)
+    tabela(s, 1.28, 2.76, 17.4, tab, [4.4, 2.6, 2.6, 2.6, 2.6, 2.6], 22)
+    texto(s, 1.28, 5.4, 17.4, 2.5, ex.get("obs_resultados", ""), 21)
 
     # 14 curvas
     s = slide_conteudo(d, "5 · resultados", "Como a rede aprendeu ao longo das épocas",
@@ -252,7 +251,7 @@ def main():
 
     # 15 por classe
     s = slide_conteudo(d, "5 · resultados", "Desempenho por classe",
-                       "mAP50 por classe, média dos folds. Com ~10 imagens de teste por classe, um acerto move a barra em "
+                       "mAP50 por classe no teste do FOLD1. Com ~10 imagens de teste por classe, um acerto move a barra em "
                        "~10 pontos: olhar tendência, não décimos. Comparar com a hipótese da Tigela (46% internet).")
     if (RES / "map_por_classe.png").exists():
         imagem(s, RES / "map_por_classe.png", 1.6, 2.5, h=7.9)
@@ -283,14 +282,14 @@ def main():
 
     # 19 dificuldades
     s = slide_conteudo(d, "dificuldades", "O que deu trabalho — e como resolvemos",
-                       "Contar as dificuldades reais: FOLD3 sem imagens, bibliotecas novas quebrando o código do YOLOv9 "
+                       "Contar as dificuldades reais: acesso à pasta compartilhada no Colab, bibliotecas novas quebrando o código do YOLOv9 "
                        "(np.trapz, torch.load), tempo de GPU para treinar do zero.")
-    card(s, 1.28, 2.76, 5.52, 4.8, TEAL, "FOLD3 sem imagens",
-         "No Drive só os .txt. Script monta o fold buscando cada imagem pelo nome nos folds 1 e 2 e confere vazamento.", 17)
+    card(s, 1.28, 2.76, 5.52, 4.8, TEAL, "Dados no Colab",
+         "A pasta do grupo é compartilhada e não aparece no Colab. Criamos um atalho no Drive e o script monta o fold e confere vazamento.", 17)
     card(s, 7.25, 2.76, 5.52, 4.8, VERMELHO, "Código quebrado",
          "NumPy 2 removeu np.trapz e o PyTorch novo mudou torch.load. Aplicamos as correções do professor.", 17)
     card(s, 13.22, 2.76, 5.52, 4.8, LARANJA, "Tempo de GPU",
-         ex.get("dif_tempo", "Do zero, o m leva horas por fold no T4. Treinamos o t nos 3 folds e o m conforme o tempo."), 17)
+         ex.get("dif_tempo", "Do zero, 100 épocas levam 44 min no t e ~2 h no m (T4). Por isso treinamos os dois só no FOLD1."), 17)
 
     # 20 conclusão
     s = slide_escuro(d, "conclusão", "Fechar com os números principais e o modelo indicado. Próximos passos: pesos "
