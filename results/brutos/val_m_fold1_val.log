@@ -1,0 +1,26 @@
+/content/yolov9/utils/general.py:29: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources as pkg
+[34m[1mval_dual: [0mdata=/content/data/fold1.yaml, weights=['/content/drive/MyDrive/yolov9_cozinha/runs/m_fold1/weights/best.pt'], batch_size=16, imgsz=640, conf_thres=0.001, iou_thres=0.7, max_det=300, task=val, device=0, workers=8, single_cls=False, augment=False, verbose=True, save_txt=False, save_hybrid=False, save_conf=False, save_json=False, project=/content/drive/MyDrive/yolov9_cozinha/runs/val, name=m_fold1_val, exist_ok=True, half=False, dnn=False, min_items=0
+YOLO 🚀 v0.1-104-g5b1ea9a Python-3.13.16 torch-2.14.1+cu130 CUDA:0 (Tesla T4, 14913MiB)
+
+Fusing layers... 
+yolov9-m summary: 588 layers, 32566180 parameters, 0 gradients, 130.8 GFLOPs
+
+[34m[1mval: [0mScanning /content/data/fold1/val.cache... 100 images, 0 backgrounds, 0 corrupt: 100%|██████████| 100/100 00:00
+[34m[1mval: [0mScanning /content/data/fold1/val.cache... 100 images, 0 backgrounds, 0 corrupt: 100%|██████████| 100/100 00:00
+
+                 Class     Images  Instances          P          R      mAP50   mAP50-95: 100%|██████████| 7/7 00:13
+                 Class     Images  Instances          P          R      mAP50   mAP50-95: 100%|██████████| 7/7 00:13
+                   all        100        100      0.823      0.723       0.87      0.682
+                 garfo        100         10      0.779        0.7      0.839      0.522
+                  faca        100         10      0.853      0.585       0.77      0.363
+                colher        100         10      0.636        0.6      0.782      0.598
+                 prato        100         10      0.713        0.9      0.962      0.847
+              espatula        100         10      0.785       0.37      0.716      0.539
+                tigela        100         10      0.897        0.7      0.926      0.813
+            frigideira        100         10          1       0.68       0.89      0.732
+                panela        100         10      0.852          1      0.977      0.853
+                xicara        100         10      0.886        0.7       0.84      0.761
+                  taca        100         10       0.83          1      0.995      0.794
+Speed: 0.3ms pre-process, 38.8ms inference, 4.6ms NMS per image at shape (16, 3, 640, 640)
+Results saved to [1m/content/drive/MyDrive/yolov9_cozinha/runs/val/m_fold1_val[0m

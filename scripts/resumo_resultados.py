@@ -12,6 +12,7 @@ from pathlib import Path
 NUM = r"([\d.]+)"
 LINHA = re.compile(rf"^\s*(\S+)\s+\d+\s+\d+\s+{NUM}\s+{NUM}\s+{NUM}\s+{NUM}\s*$")
 METRICAS = ("P", "R", "mAP50", "mAP50_95")
+CORES = {"t": "#E08A17", "m": "#0F4A57"}  # paleta dos slides
 
 
 def ler_log_val(caminho):
@@ -75,7 +76,8 @@ def graficos(pasta_logs, linhas, saida):
         with open(csvp, encoding="utf-8") as f:
             rows = [{k.strip(): v.strip() for k, v in r.items()} for r in csv.DictReader(f)]
         chave = next(k for k in rows[0] if "mAP_0.5:0.95" in k)
-        ax.plot([float(r[chave]) for r in rows], label=csvp.parent.name)
+        nome = csvp.parent.name.split("_")[0]
+        ax.plot([float(r[chave]) for r in rows], label=f"YOLOv9-{nome}", color=CORES.get(nome), lw=2)
     ax.set_xlabel("época"); ax.set_ylabel("mAP50-95 (validação)"); ax.legend(); ax.grid(alpha=.3)
     fig.tight_layout(); fig.savefig(saida / "curvas_treino.png", dpi=150); plt.close(fig)
 
@@ -83,14 +85,14 @@ def graficos(pasta_logs, linhas, saida):
     if linhas:
         classes = [k[:-6] for k in linhas[0] if k.endswith("_mAP50")]
         fig, ax = plt.subplots(figsize=(9, 4.5))
-        modelos = sorted({l["modelo"] for l in linhas})
+        modelos = sorted({l["modelo"] for l in linhas}, reverse=True)  # t, m
         larg = 0.8 / len(modelos)
         for i, m in enumerate(modelos):
             g = [l for l in linhas if l["modelo"] == m]
             vals = [statistics.mean(l.get(f"{c}_mAP50", 0) for l in g) for c in classes]
-            ax.bar([j + i * larg for j in range(len(classes))], vals, larg, label=f"YOLOv9-{m}")
+            ax.bar([j + i * larg for j in range(len(classes))], vals, larg, label=f"YOLOv9-{m}", color=CORES.get(m))
         ax.set_xticks([j + larg * (len(modelos) - 1) / 2 for j in range(len(classes))], classes, rotation=30)
-        ax.set_ylabel("mAP50 (teste, média dos folds)"); ax.legend(); ax.grid(axis="y", alpha=.3)
+        ax.set_ylabel("mAP50 no teste (FOLD1)"); ax.legend(); ax.grid(axis="y", alpha=.3)
         fig.tight_layout(); fig.savefig(saida / "map_por_classe.png", dpi=150); plt.close(fig)
 
 

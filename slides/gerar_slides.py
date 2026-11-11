@@ -246,16 +246,16 @@ def main():
                        "Curva de mAP50-95 na validação por época. Do zero, as primeiras épocas ficam perto de zero até a rede "
                        "aprender formas básicas. Comentar se a curva ainda subia no fim (mais épocas ajudariam) ou estabilizou.")
     if (RES / "curvas_treino.png").exists():
-        imagem(s, RES / "curvas_treino.png", 1.6, 2.5, h=7.9)
-    texto(s, 15.4, 3.0, 3.4, 5.0, ex.get("obs_curvas", ""), 17, CINZA)
+        imagem(s, RES / "curvas_treino.png", 1.28, 2.6, w=13.2)
+    texto(s, 14.9, 3.0, 4.0, 6.0, ex.get("obs_curvas", ""), 19, ESCURO)
 
     # 15 por classe
     s = slide_conteudo(d, "5 · resultados", "Desempenho por classe",
                        "mAP50 por classe no teste do FOLD1. Com ~10 imagens de teste por classe, um acerto move a barra em "
                        "~10 pontos: olhar tendência, não décimos. Comparar com a hipótese da Tigela (46% internet).")
     if (RES / "map_por_classe.png").exists():
-        imagem(s, RES / "map_por_classe.png", 1.6, 2.5, h=7.9)
-    texto(s, 15.4, 3.0, 3.4, 5.0, ex.get("obs_classes", ""), 17, CINZA)
+        imagem(s, RES / "map_por_classe.png", 1.28, 2.6, w=13.2)
+    texto(s, 14.9, 3.0, 4.0, 6.5, ex.get("obs_classes", ""), 18, ESCURO)
 
     # 16 matriz de confusão
     s = slide_conteudo(d, "5 · confusões", "Onde a rede erra",
@@ -267,11 +267,17 @@ def main():
     texto(s, 13.0, 3.0, 5.8, 6.0, ex.get("obs_confusao", ""), 18, ESCURO)
 
     # 17 exemplos
-    s = slide_conteudo(d, "5 · exemplos", "Detecções em imagens de teste",
-                       "Imagens que a rede nunca viu no treino. Mostrar um acerto limpo e um erro entre classes parecidas.")
-    exemplos = sorted((RES / "exemplos").glob("*.jpg"))[:4] if (RES / "exemplos").exists() else []
-    for i, e in enumerate(exemplos):
-        imagem(s, e, 1.28 + i * 4.45, 2.6, w=4.2)
+    s = slide_conteudo(d, "5 · exemplos", "Mesmas imagens de teste, t × m",
+                       "Linha de cima: YOLOv9-t (confiança 0,36). Linha de baixo: YOLOv9-m (0,54). 1) frigideira: os dois acertam. "
+                       "2) panela: os dois acertam. 3) frigideira de inox vista de cima: o m chama de panela, o t acerta — "
+                       "é o par mais difícil. 4) faca: os dois chamam de garfo — o par garfo/faca é o pior do conjunto.")
+    if (RES / "exemplos.png").exists():
+        imagem(s, RES / "exemplos.png", 2.6, 2.45, h=7.55)
+    texto(s, 1.0, 3.9, 1.5, 0.6, "t", 30, LARANJA, MONO, True, PP_ALIGN.CENTER)
+    texto(s, 1.0, 7.65, 1.5, 0.6, "m", 30, TEAL, MONO, True, PP_ALIGN.CENTER)
+    for i, (rot, cor) in enumerate([("frigideira ✓", VERDE), ("panela ✓", VERDE),
+                                    ("frigideira → m erra", VERMELHO), ("faca → os dois erram", VERMELHO)]):
+        texto(s, 2.6 + i * 3.95, 10.1, 3.7, 0.5, rot, 17, cor, MONO, True, PP_ALIGN.CENTER)
 
     # 18 escolha
     s = slide_conteudo(d, "6 · escolha", f"Modelo indicado: {ex.get('indicado', '—')}",

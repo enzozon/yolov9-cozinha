@@ -1,0 +1,23 @@
+{
+  "contagem": {
+    "fold1": {"train": {"total": 806}, "val": {"total": 100}, "test": {"total": 103}},
+    "fold2": {"train": {"total": 806}, "val": {"total": 100}, "test": {"total": 103}},
+    "fold3": {"train": {"total": 806}, "val": {"total": 100}, "test": {"total": 103}}
+  },
+  "params": {"t": "2,7 M", "m": "32,8 M"},
+  "gflops": {"t": "11,1", "m": "132,5"},
+  "tempo": {"t": "44 min", "m": "1 h 57 min"},
+  "ms": {"t": "9,9 ms", "m": "37,9 ms"},
+  "conf_f1": "0,36 (t) · 0,54 (m)",
+  "obs_resultados": [[["O m ganha em todas as métricas: ", {"negrito": true}], ["+6 pontos de mAP50 e de mAP50-95, e acha 88% dos objetos contra 72% do t.", {}]], [["O preço: ", {"negrito": true}], ["~4× mais lento por imagem e 11× mais parâmetros. Mesmo assim, 38 ms por imagem é tempo real (~26 quadros/s) num T4.", {}]]],
+  "obs_curvas": "As duas curvas ainda sobem na época 100: mais épocas ajudariam, principalmente o m. O m aprende mais rápido desde a época 20.",
+  "obs_classes": "Melhores: tigela, taça e xícara (≥ 0,95 no m). Pior: garfo (~0,55 nos dois). A faca é a única classe em que o t vence o m. A hipótese da etapa 1 (tigela pior por ter fotos da internet) não se confirmou: é a melhor classe.",
+  "obs_confusao": [[["Os pares previstos na etapa 1 aparecem: ", {"negrito": true}]], "faca → garfo em 45% das facas", "frigideira ↔ panela: 30% para cada lado", "espátula → colher em 30%", "prato não detectado (fundo) em 18%", [["Fora desses pares quase não há erro.", {"cor": "5B6674"}]]],
+  "indicado": "YOLOv9-m",
+  "nota_indicado": "Indicamos o m: é o mais preciso no teste (mAP50 0,860 contra 0,799; mAP50-95 0,684 contra 0,623) e acha mais objetos (R 0,88). Continua rodando em tempo real no T4. O t só vale a pena quando o hardware é fraco (celular, Raspberry): é 4× mais rápido e o arquivo tem 6 MB em vez de 66 MB.",
+  "escolha_precisao": "mAP50 0,860 e mAP50-95 0,684 no teste, contra 0,799 e 0,623 do t. Erra menos nos pares parecidos (colher, espátula, xícara).",
+  "escolha_custo": "38 ms por imagem no T4 (~26 quadros/s) e 66 MB. O t faz 10 ms e 6 MB: melhor para celular ou Raspberry Pi.",
+  "escolha_pratica": "Para a avaliação com imagens novas usamos o m com confiança 0,54, o limiar de F1 máximo na validação.",
+  "dif_tempo": "Do zero, 100 épocas levaram 44 min no t e quase 2 h no m (Colab T4). Por isso treinamos os dois só no FOLD1.",
+  "conclusao": [["mAP50 0,86 no teste", "YOLOv9-m treinado do zero, 103 imagens nunca vistas"], ["m > t em 9 das 10 classes", "custo: 4× mais lento, ainda em tempo real"], ["erros caem nos pares previstos", "faca/garfo, frigideira/panela, espátula/colher"]]
+}
