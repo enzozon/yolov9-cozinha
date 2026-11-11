@@ -86,8 +86,8 @@ for m in ('t', 'm'):
         if os.path.exists(f'{RUNS}/{m}_fold{f}/weights/best.pt'):
             avaliar(m, f, 'test'); avaliar(m, f, 'val')"""),
     ("code", """# 7. Dia da apresentação: detecção nas imagens novas do professor
-PESOS = f'{RUNS}/m_fold1/weights/best.pt'   # trocar pelo modelo indicado
-CONF = 0.25                                  # trocar pelo threshold escolhido (máx. F1)
+PESOS = f'{RUNS}/m_fold1/weights/best.pt'   # modelo indicado: YOLOv9-m
+CONF = 0.54                                  # limiar de F1 máximo do m na validação
 PASTA = '/content/drive/MyDrive/yolov9_cozinha/avaliacao'  # subir as imagens aqui
 detectar(PESOS, PASTA, CONF, 'avaliacao')"""),
 ]
