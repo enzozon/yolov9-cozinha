@@ -50,8 +50,8 @@ def sh(cmd, log=None):
     if f: f.close()
     return p.returncode
 
-def treinar(modelo, fold, batch, epocas=100):
-    nome = f'{modelo}_fold{fold}'
+def treinar(modelo, fold, batch, epocas=100, sufixo=''):
+    nome = f'{modelo}_fold{fold}{sufixo}'
     last = f'{RUNS}/{nome}/weights/last.pt'
     csv_ = f'{RUNS}/{nome}/results.csv'
     if os.path.exists(csv_) and sum(1 for _ in open(csv_)) - 1 >= epocas:
@@ -64,8 +64,8 @@ def treinar(modelo, fold, batch, epocas=100):
                f'--hyp data/hyps/hyp.scratch-high.yaml --cache ram --project {RUNS} --name {nome} --exist-ok')
     return sh(cmd, f'{RUNS}/{nome}_train.log')
 
-def avaliar(modelo, fold, split='test'):
-    nome = f'{modelo}_fold{fold}'
+def avaliar(modelo, fold, split='test', sufixo=''):
+    nome = f'{modelo}_fold{fold}{sufixo}'
     return sh(f'python val_dual.py --device 0 --batch-size 16 --img 640 --conf 0.001 --iou 0.7 --task {split} '
               f'--data /content/data/fold{fold}.yaml --weights {RUNS}/{nome}/weights/best.pt --verbose '
               f'--project {RUNS}/val --name {nome}_{split} --exist-ok', f'{RUNS}/val_{nome}_{split}.log')
@@ -80,6 +80,9 @@ treinar('t', 1, 16)
 treinar('m', 1, 8)
 # treinar('m', 2, 8)
 # treinar('m', 3, 8)"""),
+    ("code", """# 5b. Mesmo m no FOLD1, agora com 200 épocas (as curvas ainda subiam na época 100)
+treinar('m', 1, 8, epocas=200, sufixo='_200ep')
+avaliar('m', 1, 'test', '_200ep'); avaliar('m', 1, 'val', '_200ep')"""),
     ("code", """# 6. Avaliação no Teste de cada fold (e na Validação, para escolher o threshold pela curva F1)
 for m in ('t', 'm'):
     for f in (1, 2, 3):
